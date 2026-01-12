@@ -1,0 +1,45 @@
+services:
+
+  predlogi-db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: predlogi 
+    volumes:
+      - predlogi-pgdata:/var/lib/postgresql/data 
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 3s
+      timeout: 10s
+      retries: 5
+
+
+  predlogi:
+    ports:
+      - "8080:8080"
+    restart: always
+    build: .
+    depends_on:
+      predlogi-db:
+        condition: service_healthy
+    environment:
+      - LOG_LEVEL=DEBUG
+      - TZ=
+      - POSTGRES_IP=predlogi-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE_NAME=predlogi
+      - POSTGRES_TEST_DATABASE_NAME=predlogi_test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthcheck"]
+      interval: 3s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  predlogi-pgdata:
