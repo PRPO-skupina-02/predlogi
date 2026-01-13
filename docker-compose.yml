@@ -6,9 +6,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: predlogi 
+      POSTGRES_DB: predlogi
     volumes:
-      - predlogi-pgdata:/var/lib/postgresql/data 
+      - predlogi-pgdata:/var/lib/postgresql/data
     ports:
       - 5432:5432
     healthcheck:
@@ -35,6 +35,16 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DATABASE_NAME=predlogi
       - POSTGRES_TEST_DATABASE_NAME=predlogi_test
+      - AUTH_HOST=${AUTH_HOST:-http://auth:8080}
+      - NAKUP_HOST=${NAKUP_HOST:-http://nakup:8080}
+      - SPORED_HOST=${SPORED_HOST:-http://spored:8080}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-openai/gpt-4}
+      - OPENROUTER_MAX_TOKENS=${OPENROUTER_MAX_TOKENS:-500}
+      - RECOMMENDATION_SCHEDULE=${RECOMMENDATION_SCHEDULE:-0 9 * * 1,4}
+      - RECOMMENDATION_LOOKAHEAD_DAYS=${RECOMMENDATION_LOOKAHEAD_DAYS:-7}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/healthcheck"]
       interval: 3s

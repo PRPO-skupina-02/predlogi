@@ -10,6 +10,7 @@ import (
 	"github.com/PRPO-skupina-02/common/validation"
 	"github.com/PRPO-skupina-02/predlogi/api"
 	"github.com/PRPO-skupina-02/predlogi/db"
+	"github.com/PRPO-skupina-02/predlogi/predlogi"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,12 +24,12 @@ func main() {
 }
 
 func run() error {
-	slog.Info("Starting server")
+	slog.Info("Starting predlogi service")
 
 	logger := logging.GetDefaultLogger()
 	slog.SetDefault(logger)
 
-	db, err := database.OpenAndMigrateProd(db.MigrationsFS)
+	database, err := database.OpenAndMigrateProd(db.MigrationsFS)
 	if err != nil {
 		return err
 	}
@@ -38,8 +39,14 @@ func run() error {
 		return err
 	}
 
+	// Setup cron scheduler for recommendation job
+	err = predlogi.SetupCron(database)
+	if err != nil {
+		return err
+	}
+
 	router := gin.Default()
-	api.Register(router, db, trans)
+	api.Register(router, database, trans)
 
 	slog.Info("Server startup complete")
 	err = router.Run(":8080")

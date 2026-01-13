@@ -1,0 +1,54 @@
+basePath: /api/v1/predlogi
+definitions:
+  middleware.HttpError:
+    properties:
+      code:
+        type: integer
+      fields:
+        additionalProperties:
+          type: string
+        type: object
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Movie recommendation service for the PRPO project
+  title: Predlogi API
+  version: "1.0"
+paths:
+  /api/v1/predlogi/admin/trigger-job:
+    post:
+      description: Triggers the recommendation generation process for all users
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/middleware.HttpError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/middleware.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middleware.HttpError'
+      security:
+      - BearerAuth: []
+      summary: Manually trigger recommendation generation job
+      tags:
+      - admin
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
