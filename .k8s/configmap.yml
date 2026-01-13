@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: predlogi-config
+  namespace: production
+data:
+  LOG_LEVEL: "INFO"
+  AUTH_HOST: "http://auth:8080"
+  NAKUP_HOST: "http://nakup:8080"
+  SPORED_HOST: "http://spored:8080"
+  RABBITMQ_URL: "amqp://rabbitmq:5672"
+  OPENROUTER_MODEL: "anthropic/claude-3.5-sonnet"
+  OPENROUTER_BASE_URL: "https://openrouter.ai/api/v1"
+  OPENROUTER_MAX_TOKENS: "1024"
+  RECOMMENDATION_LOOKAHEAD_DAYS: "7"

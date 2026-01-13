@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: predlogi
+  namespace: production
+  labels:
+    app: predlogi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: predlogi
+  template:
+    metadata:
+      labels:
+        app: predlogi
+    spec:
+      serviceAccountName: predlogi-sa
+      containers:
+      - name: predlogi
+        image: ghcr.io/prpo-skupina-02/predlogi:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: LOG_LEVEL
+        - name: TZ
+          value: "Europe/Ljubljana"
+        - name: POSTGRES_IP
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: host
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+        - name: POSTGRES_DATABASE_NAME
+          value: "predlogi"
+        - name: AUTH_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: AUTH_HOST
+        - name: NAKUP_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: NAKUP_HOST
+        - name: SPORED_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: SPORED_HOST
+        - name: RABBITMQ_URL
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: RABBITMQ_URL
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: predlogi-secrets
+              key: OPENROUTER_API_KEY
+        - name: OPENROUTER_MODEL
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: OPENROUTER_MODEL
+        - name: OPENROUTER_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: OPENROUTER_BASE_URL
+        - name: OPENROUTER_MAX_TOKENS
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: OPENROUTER_MAX_TOKENS
+        - name: RECOMMENDATION_LOOKAHEAD_DAYS
+          valueFrom:
+            configMapKeyRef:
+              name: predlogi-config
+              key: RECOMMENDATION_LOOKAHEAD_DAYS
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
