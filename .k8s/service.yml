@@ -5,6 +5,8 @@ metadata:
   namespace: production
   labels:
     app: predlogi
+  annotations:
+    cloud.google.com/backend-config: '{"default": "predlogi-backendconfig"}'
 spec:
   type: ClusterIP
   ports:
