@@ -4,15 +4,14 @@ metadata:
   name: predlogi
   namespace: production
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     kubernetes.io/ingress.class: "gce"
 spec:
   tls:
   - hosts:
-    - predlogi.prpo.timhrovat.com
+    - predlogi.cinecore.timhrovat.com
     secretName: predlogi-tls
   rules:
-  - host: predlogi.prpo.timhrovat.com
+  - host: predlogi.cinecore.timhrovat.com
     http:
       paths:
       - path: /
